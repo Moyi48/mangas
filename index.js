@@ -1,37 +1,80 @@
 const mangas = [
-    { titulo: "Naruto", precio: 10 },
-    { titulo: "One Piece", precio: 12 },
-    { titulo: "Attack on Titan", precio: 15 },
-    { titulo: "Death Note", precio: 8 },
-    { titulo: "Dragon Ball", precio: 10 }
+    { id: 1, titulo: "Naruto", precio: 10 },
+    { id: 2, titulo: "One Piece", precio: 12 },
+    { id: 3, titulo: "Attack on Titan", precio: 15 },
+    { id: 4, titulo: "Death Note", precio: 8 },
+    { id: 5, titulo: "Dragon Ball", precio: 10 }
 ];
 
 const mangasListContainer = document.getElementById("mangas-list");
+const cartItemsContainer = document.getElementById("cart-items");
+const cartTotalContainer = document.getElementById("cart-total");
 
-// Función para mostrar la lista de mangas en el DOM
+// Arreglo para almacenar los mangas seleccionados en el carrito
+let carrito = [];
+
+// Función para mostrar los mangas en el DOM
 function mostrarMangas() {
     mangasListContainer.innerHTML = "";
     mangas.forEach(manga => {
         const mangaDiv = document.createElement("div");
-        mangaDiv.classList.add("manga");
         mangaDiv.innerHTML = `
             <h3>${manga.titulo}</h3>
             <p>Precio: $${manga.precio}</p>
-            <button onclick="comprarManga('${manga.titulo}', ${manga.precio})">Comprar</button>
+            <button onclick="agregarAlCarrito(${manga.id})">Agregar al Carrito</button>
         `;
         mangasListContainer.appendChild(mangaDiv);
     });
 }
 
-// Función para simular la compra de un manga
-function comprarManga(titulo, precio) {
-    const confirmacion = confirm(`¿Deseas comprar "${titulo}" por $${precio}?`);
-    if (confirmacion) {
-        alert(`¡"${titulo}" comprado con éxito!`);
-    } else {
-        alert("Compra cancelada.");
+// Función para agregar un manga al carrito
+function agregarAlCarrito(mangaId) {
+    const manga = mangas.find(manga => manga.id === mangaId);
+    if (manga) {
+        carrito.push(manga);
+        mostrarCarrito();
     }
 }
 
-// Mostrar la lista de mangas al cargar la página
+// Función para mostrar el carrito en el DOM
+function mostrarCarrito() {
+    cartItemsContainer.innerHTML = "";
+    let total = 0;
+    carrito.forEach(manga => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${manga.titulo} - $${manga.precio}`;
+        cartItemsContainer.appendChild(listItem);
+        total += manga.precio;
+    });
+    cartTotalContainer.textContent = total.toFixed(2);
+}
+
+// Función para sacar un manga del carrito
+function sacarDelCarrito(mangaId) {
+    carrito = carrito.filter(manga => manga.id !== mangaId);
+    mostrarCarrito();
+}
+
+// Mostrar los mangas al cargar la página
 mostrarMangas();
+
+// Función para mostrar el carrito en el DOM
+function mostrarCarrito() {
+    cartItemsContainer.innerHTML = "";
+    let total = 0;
+    carrito.forEach(manga => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${manga.titulo} - $${manga.precio}`;
+        
+        // Botón para sacar el manga del carrito
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Quitar";
+        removeButton.addEventListener("click", () => sacarDelCarrito(manga.id));
+        
+        listItem.appendChild(removeButton);
+        
+        cartItemsContainer.appendChild(listItem);
+        total += manga.precio;
+    });
+    cartTotalContainer.textContent = total.toFixed(2);
+}
