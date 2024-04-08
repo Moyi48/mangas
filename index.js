@@ -10,6 +10,20 @@ const mangasListContainer = document.getElementById("mangas-list");
 const cartItemsContainer = document.getElementById("cart-items");
 const cartTotalContainer = document.getElementById("cart-total");
 
+// Función para cargar el carrito desde el almacenamiento local
+function cargarCarritoDesdeLocalStorage() {
+    const carritoGuardado = localStorage.getItem("carrito");
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+        mostrarCarrito();
+    }
+}
+
+// Función para guardar el carrito en el almacenamiento local
+function guardarCarritoEnLocalStorage() {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
 // Arreglo para almacenar los mangas seleccionados en el carrito
 let carrito = [];
 
@@ -33,30 +47,16 @@ function agregarAlCarrito(mangaId) {
     if (manga) {
         carrito.push(manga);
         mostrarCarrito();
+        guardarCarritoEnLocalStorage();
     }
-}
-
-// Función para mostrar el carrito en el DOM
-function mostrarCarrito() {
-    cartItemsContainer.innerHTML = "";
-    let total = 0;
-    carrito.forEach(manga => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `${manga.titulo} - $${manga.precio}`;
-        cartItemsContainer.appendChild(listItem);
-        total += manga.precio;
-    });
-    cartTotalContainer.textContent = total.toFixed(2);
 }
 
 // Función para sacar un manga del carrito
 function sacarDelCarrito(mangaId) {
     carrito = carrito.filter(manga => manga.id !== mangaId);
     mostrarCarrito();
+    guardarCarritoEnLocalStorage();
 }
-
-// Mostrar los mangas al cargar la página
-mostrarMangas();
 
 // Función para mostrar el carrito en el DOM
 function mostrarCarrito() {
@@ -65,16 +65,22 @@ function mostrarCarrito() {
     carrito.forEach(manga => {
         const listItem = document.createElement("li");
         listItem.textContent = `${manga.titulo} - $${manga.precio}`;
-        
+
         // Botón para sacar el manga del carrito
         const removeButton = document.createElement("button");
         removeButton.textContent = "Quitar";
         removeButton.addEventListener("click", () => sacarDelCarrito(manga.id));
-        
+
         listItem.appendChild(removeButton);
-        
+
         cartItemsContainer.appendChild(listItem);
         total += manga.precio;
     });
     cartTotalContainer.textContent = total.toFixed(2);
 }
+
+// Cargar el carrito desde el almacenamiento local al cargar la página
+cargarCarritoDesdeLocalStorage();
+
+// Mostrar los mangas al cargar la página
+mostrarMangas();
